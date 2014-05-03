@@ -1,6 +1,0 @@
-language: node_js
-before_install:
-  - git submodule update --init --recursive
-node_js:
-  - 0.6
-  - 0.8
