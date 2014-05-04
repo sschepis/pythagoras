@@ -25,7 +25,7 @@ var generatePythagoreanScale = function(octaveCount, octaveDivisions, octaveBase
 		for(var noteIndex = 0;noteIndex < octaveDivisions; noteIndex++) {
 			var octaveNote = octaveRootNote + (octaveStep * noteIndex);
 			octout.notes.push({
-				value  : Math.round(octaveNote * 10) / 10,
+				value  : Math.round(octaveNote * 100) / 100,
 				offset : noteIndex +1
 			});
 		}

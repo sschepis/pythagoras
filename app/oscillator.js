@@ -18,12 +18,9 @@ var toggleOscillator = function(freq) {
         var o = oscillators[sfreq];
         if(o.noteOn === true) {
             o.oscillator.disconnect();
-        } else {
-            o.oscillator.connect(context.destination);
-            o.oscillator.noteOn && o.oscillator.noteOn(0); 
+            delete oscillators[sfreq];
         }
-        oscillators[sfreq].noteOn = !oscillators[sfreq].noteOn;
-        return oscillators[sfreq].noteOn;
+        return false;
     } 
     else {
         var oscillator = {
@@ -34,5 +31,13 @@ var toggleOscillator = function(freq) {
         };
         oscillators[sfreq] = oscillator;
         return true;
+    }
+};
+
+var destroyOscillators = function() {
+    var k = Object.keys(oscillators);
+    for(var i=0;i<k.length;i++) {
+        oscillators[k[i]].oscillator.disconnect();
+        delete oscillators[k[i]];
     }
 };
