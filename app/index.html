@@ -14,190 +14,25 @@
 <script type="text/javascript" src="primefactor.js"></script>  
 <script type="text/javascript" src="touchpunch.js"></script>  
 <script type="text/javascript" src="two.js"></script>      
-<script type="text/javascript" src="polygon.js"></script>       
-<script type='text/javascript'>
+<script type="text/javascript" src="polygon.js"></script>  
+<script type="text/javascript" src="app.js"></script>       
 
-
-var freqbag = {};
-function buildScale(tblid,n,s,m,o,callback) {
-    generatePythagoreanScale(n,m,s,o,function(err,ret){
-        var out = '';
-        for(var i=0;i<ret.octaves.length;i++) {
-            out += '<tr>';
-            for(var j=0;j<ret.octaves[i].notes.length;j++) {
-                var classes = Array();
-                var note = ret.octaves[i].notes[j];
-                var offset = note.offset,
-                    value = note.value,
-                    phase = note.phase;
-                var primefactors = (offset == 1 ? Array() : primeFactorList(offset));
-                if(offset == 1) primefactors.push(1);
-                for(var x=0;x<primefactors.length;x++) {
-                    var pf=primefactors[x];
-                    if(x==0) classes.push('prime-' + pf);
-                    else {
-                        if(primefactors[x-1] !== pf)
-                            classes.push('prime-' + pf);
-                    }
-                }
-                var freqid =  (value * 100) + '';
-                var notetr = '<td class="unselectable note ' 
-                    + classes.join(' ') + ' t_' + tblid + '" id="' + freqid + '">' 
-                    + value + '</td>';
-                out += notetr;
-                freqbag[freqid] = ret.octaves[i].notes[j];
-                if(j===ret.octaves[i].notes.length-1) {
-                    freqid = ret.octaves[i].notes[0].value * ret.octaves[i].base * 100;
-                    var notetr = '<td class="unselectable note prime-1 t_' 
-                        + tblid + '" id="' + freqid + '">' 
-                        + ret.octaves[i].notes[0].value * ret.octaves[i].base + '</td>';
-                    out += notetr;
-                }
-            }
-            out += '</tr>';
-        }
-        $('#'+tblid).html(out);
-        callback();
-    });
-}
-
-function toggleNote(evt) {
-    var freq = freqbag[evt.target.id].value;
-    var phase = freqbag[evt.target.id].phase;
-    var state = toggleOscillator(freq, phase);
-    if(state) {
-        $(evt.target).addClass('note-on');
-        freqbag[evt.target.id].polygons = drawPrimeFactorPolygons(freq);
-    }
-    else {
-        $(evt.target).removeClass('note-on');
-        if('polygons' in freqbag[evt.target.id]) {
-            for(var i=0;i<freqbag[evt.target.id].polygons.length;i++)
-                freqbag[evt.target.id].polygons[i].remove();
-        }
-        delete oscillators[evt.target.id];
-        two.update();
-    }
-}
-
-function buildScales() {
-    var n = parseInt($('#n').val());
-    var m = parseInt($('#m').val());
-    var s = parseInt($('#s').val());
-    var o = parseInt($('#o').val());
-    buildScale('frequencies',n,m,s,o,function() {
-
-    n = parseInt($('#n2').val());
-    m = parseInt($('#m2').val());
-    s = parseInt($('#s2').val());
-    o = parseInt($('#o2').val());
-    buildScale('frequencies2',n,m,s,o,function() {});
-
-    });
-}
-
-function initTwoSurface(elid, width, height) {
-    var elem = document.getElementById(elid);
-    var params = { width: width, height: height }; 
-    var two = new Two(params).appendTo(elem);
-    return two;
-}
-
-var defaultOptions = {
-    fill : 'rgba(0, 200, 255, 0.25)',
-    stroke : '#1C75BC'
-};
-function is_int(value){ 
-  if((parseFloat(value) == parseInt(value)) && !isNaN(value)){
-      return true;
-  } else { 
-      return false;
-  } 
-}
-function drawPrimeFactorPolygons(value, options) {
-    var apf = primeFactorList(is_int(value)?value:value*2);
-    var pf = Array();
-    var polygons = Array();
-    if(!options) options = defaultOptions;
-    var lastPf=0;
-    for(var i=apf.length-1;i>=0;i--) {
-        pf.push(apf[i]);
-        if((i<apf.length-1&&apf[i+1]!==apf[i]) || i===0) {
-            var nsides = pf[0];
-            var nscount = pf.length;
-            var sangle = 0;
-            pf = Array();
-            // if(nsides===2) {
-            //     if(lastPf===0) nsides=4;
-            //     else {
-            //         nsides = lastPf; 
-            //         sangle = 180 / nsides; 
-            //     }
-            // }
-            lastPf = nsides;
-            var rp = regularPolygon(nsides, 200, sangle, { x : 240, y : 240 });   
-            rp = arrayizePoints(rp);
-            rp.push(false);                    
-            var poly = two.makePolygon.apply(two, rp);
-            poly.fill = options.fill;
-            poly.stroke = options.stroke;
-            polygons.push(poly);
-        }
-    }
-    two.update();    
-    return polygons;
-}
-
-var two;
-$(document).ready(function(){
-    buildScales();
-
-    $('.note').click(function(evt) {
-        toggleNote(evt);
-        var cbid = $(evt.target).hasClass('t_frequencies') ? '#z' : '#z2';
-        if(!$(cbid).attr('checked')) {
-            setTimeout(function(){
-                toggleNote(evt);
-            }, 200);
-        }
-    });
-
-    $('.rb').click(function(evt) {
-        destroyOscillators();
-        buildScales();
-    });
-
-    two = initTwoSurface('rendercanvas', 480, 480);
-    // var rp = regularPolygon(6, 200, 0, { x : 240, y : 240 });
-
-    // rp = arrayizePoints(rp);
-    // rp.push(false);
-
-    // var poly = two.makePolygon.apply(two, rp);
-
-    // poly.fill = 'rgba(0, 200, 255, 0.75)';
-    // poly.stroke = '#1C75BC';
-
-    // two.update();
-});
-
-</script>
 </head>
 <body>
     <table id='frequencies' class="unselectable" cellpadding=0 cellspacing=0 border=0>
     </table>
-    <input class="inputfield" id="n" type="text" value="3"/> 
+    <input class="inputfield" id="n" type="text" value="4"/> 
     <input class="inputfield" id="m" type="text" value="2"/> 
     <input class="inputfield" id="s" type="text" value="9"/>
-    <input class="inputfield" id="o" type="text" value="108"/>
+    <input class="inputfield" id="o" type="text" value="27"/>
     <input class="inputfield" id="z" type="checkbox" checked/>
     <input class="rb" type="button" value="change"/>
     <table id='frequencies2' class="unselectable" cellpadding=0 cellspacing=0 border=0>
     </table>
-    <input class="inputfield" id="n2" type="text" value="3"/> 
+    <input class="inputfield" id="n2" type="text" value="4"/> 
     <input class="inputfield" id="m2" type="text" value="3"/> 
     <input class="inputfield" id="s2" type="text" value="12"/>
-    <input class="inputfield" id="o2" type="text" value="81"/>
+    <input class="inputfield" id="o2" type="text" value="9"/>
     <input class="inputfield" id="z2" type="checkbox" checked/>
     <input class="rb" type="button" value="change"/> 
     <div class="480wide center clear">

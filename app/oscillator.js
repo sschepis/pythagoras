@@ -5,19 +5,19 @@ var getOscillator = function(freq, phase, play) {
     var oscillator = context.createOscillator();
     oscillator.type = 0;
 
-    var real = new Float32Array(4096);
-    var imag = new Float32Array(4096);
-
-    var a1 = 0.0;
-    var b1 = 1.0;
-
-    var shift = 2 * Math.PI * phase; // Shift the waveform 50%
-    real[1] = a1 * Math.cos(shift) - b1 * Math.sin(shift);
-    imag[1] = a1 * Math.sin(shift) + b1 * Math.cos(shift);
-    var wt = context.createWaveTable(real, imag);
+    if(window.mobilecheck()==true) {
+        var real = new Float32Array(4096);
+        var imag = new Float32Array(4096);
+        var a1 = 0.0;
+        var b1 = 1.0;
+        var shift = 2 * Math.PI * phase; // Shift the waveform
+        real[1] = a1 * Math.cos(shift) - b1 * Math.sin(shift);
+        imag[1] = a1 * Math.sin(shift) + b1 * Math.cos(shift);
+        var wt = context.createWaveTable(real, imag);
+        oscillator.setWaveTable(wt);
+    }
 
     oscillator.frequency.value = freq;
-    oscillator.setWaveTable(wt);
 
     if(play) {
         oscillator.connect(context.destination);
@@ -60,6 +60,8 @@ var getAndStoreOscillator = function(freq, phase, play) {
 var destroyOscillators = function() {
     var k = Object.keys(oscillators);
     for(var i=0;i<k.length;i++) {
-        oscillators[k[i]].oscillator.disconnect();
+        k[i].oscillator.disconnect();
+        k[i].oscillator.noteOn = false;
     }
+    oscillators = {};
 };
