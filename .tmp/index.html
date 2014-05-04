@@ -1,150 +1,35 @@
-
-<!DOCTYPE html>
-<html>
 <head>
-    <meta charset="utf-8">
-    <title>Web Audio - Tone Playing Experiment</title>
-    <style>
-        .primary-1 { background-color: #00AF64 }
-        .primary-2 { background-color: #218359 }
-        .primary-3 { background-color: #007241 }
-        .primary-4 { background-color: #36D792 }
-        .primary-5 { background-color: #61D7A4 }
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, maximum-scale=1, user-scalable=no" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+<title>Web Audio - Tone Playing Experiment</title>
+<link rel="stylesheet" type="text/css" href="style.css" />
 
-        .secondary-a-1 { background-color: #0B61A4 }
-        .secondary-a-2 { background-color: #25567B }
-        .secondary-a-3 { background-color: #033E6B }
-        .secondary-a-4 { background-color: #3F92D2 }
-        .secondary-a-5 { background-color: #66A3D2 }
-
-        .secondary-b-1 { background-color: #FF9200 }
-        .secondary-b-2 { background-color: #BF8230 }
-        .secondary-b-3 { background-color: #A65F00 }
-        .secondary-b-4 { background-color: #FFAD40 }
-        .secondary-b-5 { background-color: #FFC373 }
-
-        .complement-1 { background-color: #FF4900 }
-        .complement-2 { background-color: #BF5930 }
-        .complement-3 { background-color: #A62F00 }
-        .complement-4 { background-color: #FF7640 }
-        .complement-5 { background-color: #FF9B73 !important; }
-
-        .prime-1 { background-color: #bbb }
-        .prime-2 { background-color: #66A3D2 }
-        .prime-3 { background-color: #61D7A4 }
-        .prime-5 { background-color: #FFC373 }
-        .prime-7 { background-color: #FF9B73 }
-        .prime-11 { background-color: #C5567B }
-        .prime-13 { background-color: #BF8230 }
- 
- .unselectable {
-  -moz-user-select: none;
-  -webkit-user-select: none;
-  -ms-user-select: none;
-}
-
-        .note {
-            width:85px;
-            height:55px;
-        }
-
-        td {
-            text-align : center;
-        }
-
-        .note-on {
-            background-color : red !important;
-        }
-    </style>
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js"></script>
-    <script type="text/javascript" src="sound.js"></script>    
-    <script type="text/javascript" src="octave.js"></script>  
-    <script type="text/javascript" src="oscillator.js"></script>  
-    <script type="text/javascript" src="primefactor.js"></script>  
-    <script type="text/javascript" src="touchpunch.js"></script>  
-    <script type='text/javascript'>
-
-    /* 
- * Returns the smallest prime factor of the given integer.
- * Examples:
- *   smallestFactor(2) = 2
- *   smallestFactor(15) = 3
- */
-function smallestFactor(n) {
-    if (n < 2)
-        throw "Argument error";
-    
-    if (n % 2 == 0)
-        return 2;
-    var end = Math.floor(Math.sqrt(n));
-    for (var i = 3; i <= end; i += 2) {
-        if (n % i == 0)
-            return i;
-    }
-    return n;
-}
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js"></script>
+<script type="text/javascript" src="sound.js"></script>    
+<script type="text/javascript" src="octave.js"></script>  
+<script type="text/javascript" src="oscillator.js"></script>  
+<script type="text/javascript" src="primefactor.js"></script>  
+<script type="text/javascript" src="touchpunch.js"></script>  
+<script type="text/javascript" src="two.js"></script>      
+<script type="text/javascript" src="polygon.js"></script>       
+<script type='text/javascript'>
 
 
-/* 
- * Returns the prime factorization as a list of factor-power pairs, from the given factor list. The given list must be in ascending order.
- * Examples:
- *   toFactorPowerList([2, 2, 2]) = [[2, 3]]
- *   toFactorPowerList([3, 5]) = [[3, 1], [5, 1]]
- */
-function toFactorPowerList(factors) {
-    var result = [];
-    var factor = factors[0];
-    var count = 1;
-    for (var i = 1; i < factors.length; i++) {
-        if (factors[i] == factor) {
-            count++;
-        } else {
-            result.push([factor, count]);
-            factor = factors[i];
-            count = 1;
-        }
-    }
-    result.push([factor, count]);
-    return result;
-}
-
-/* 
- * Returns the list of prime factors (in ascending order) of the given integer.
- * Examples:
- *   primeFactorList(1) = []
- *   primeFactorList(7) = [7]
- *   primeFactorList(60) = [2, 2, 3, 5]
- */
-function primeFactorList(n) {
-    if (n < 1)
-        throw "Argument error";
-    
-    var result = [];
-    while (n != 1) {
-        var factor = smallestFactor(n);
-        result.push(factor);
-        n /= factor;
-    }
-    return result;
-}
-function toggleNote(evt) {
-    var state = toggleOscillator(parseInt(evt.target.id)/100);
-    if(state) $(evt.target).addClass('note-on');
-    else $(evt.target).removeClass('note-on');
-}
-function buildScale() {
-    var n = parseInt($('#n').val());
-    var m = parseInt($('#m').val());
-    var s = parseInt($('#s').val());
-    var o = parseInt($('#o').val());
-    generatePythagoreanScale(n,s,m,o,function(err,ret){
+var freqbag = {};
+function buildScale(tblid,n,s,m,o,callback) {
+    generatePythagoreanScale(n,m,s,o,function(err,ret){
         var out = '';
         for(var i=0;i<ret.octaves.length;i++) {
             out += '<tr>';
             for(var j=0;j<ret.octaves[i].notes.length;j++) {
                 var classes = Array();
-                var offset = ret.octaves[i].notes[j].offset,
-                    value = ret.octaves[i].notes[j].value;
+                var note = ret.octaves[i].notes[j];
+                var offset = note.offset,
+                    value = note.value,
+                    phase = note.phase;
                 var primefactors = (offset == 1 ? Array() : primeFactorList(offset));
                 if(offset == 1) primefactors.push(1);
                 for(var x=0;x<primefactors.length;x++) {
@@ -155,81 +40,168 @@ function buildScale() {
                             classes.push('prime-' + pf);
                     }
                 }
-                out += '<td class="unselectable note ' + classes.join(' ') + '" id="' + ( value * 100 ) + '">' 
-                     + value 
-                     + '</td>';
+                var freqid =  (value * 100) + '';
+                var notetr = '<td class="unselectable note ' 
+                    + classes.join(' ') + ' t_' + tblid + '" id="' + freqid + '">' 
+                    + value + '</td>';
+                out += notetr;
+                freqbag[freqid] = ret.octaves[i].notes[j];
+                if(j===ret.octaves[i].notes.length-1) {
+                    freqid = ret.octaves[i].notes[0].value * ret.octaves[i].base * 100;
+                    var notetr = '<td class="unselectable note prime-1 t_' 
+                        + tblid + '" id="' + freqid + '">' 
+                        + ret.octaves[i].notes[0].value * ret.octaves[i].base + '</td>';
+                    out += notetr;
+                }
             }
             out += '</tr>';
         }
-        $('#frequencies').html(out);
-    });    
+        $('#'+tblid).html(out);
+        callback();
+    });
+}
+
+function toggleNote(evt) {
+    var freq = freqbag[evt.target.id].value;
+    var phase = freqbag[evt.target.id].phase;
+    var state = toggleOscillator(freq, phase);
+    if(state) {
+        $(evt.target).addClass('note-on');
+        freqbag[evt.target.id].polygons = drawPrimeFactorPolygons(freq);
+    }
+    else {
+        $(evt.target).removeClass('note-on');
+        if('polygons' in freqbag[evt.target.id]) {
+            for(var i=0;i<freqbag[evt.target.id].polygons.length;i++)
+                freqbag[evt.target.id].polygons[i].remove();
+        }
+        delete oscillators[evt.target.id];
+        two.update();
+    }
+}
+
+function buildScales() {
+    var n = parseInt($('#n').val());
+    var m = parseInt($('#m').val());
+    var s = parseInt($('#s').val());
+    var o = parseInt($('#o').val());
+    buildScale('frequencies',n,m,s,o,function() {
 
     n = parseInt($('#n2').val());
     m = parseInt($('#m2').val());
     s = parseInt($('#s2').val());
     o = parseInt($('#o2').val());
-    generatePythagoreanScale(n,s,m,o,function(err,ret){
-        var out = '';
-        for(var i=0;i<ret.octaves.length;i++) {
-            out += '<tr>';
-            for(var j=0;j<ret.octaves[i].notes.length;j++) {
-                var classes = Array();
-                var offset = ret.octaves[i].notes[j].offset,
-                    value = ret.octaves[i].notes[j].value;
-                var primefactors = (offset == 1 ? Array() : primeFactorList(offset));
-                if(offset == 1) primefactors.push(1);
-                for(var x=0;x<primefactors.length;x++) {
-                    var pf=primefactors[x];
-                    if(x==0) classes.push('prime-' + pf);
-                    else {
-                        if(primefactors[x-1] !== pf)
-                            classes.push('prime-' + pf);
-                    }
-                }
-                out += '<td class="unselectable note ' + classes.join(' ') + '" id="' + ( value * 100 ) + '">' 
-                     + value 
-                     + '</td>';
-            }
-            out += '</tr>';
-        }
-        $('#frequencies2').html(out);
-    });
-    $('.note').click(function(evt) {
-        toggleNote(evt);
-        setTimeout(function(){
-            toggleNote(evt);
-        }, 200);
+    buildScale('frequencies2',n,m,s,o,function() {});
+
     });
 }
 
+function initTwoSurface(elid, width, height) {
+    var elem = document.getElementById(elid);
+    var params = { width: width, height: height }; 
+    var two = new Two(params).appendTo(elem);
+    return two;
+}
 
+var defaultOptions = {
+    fill : 'rgba(0, 200, 255, 0.25)',
+    stroke : '#1C75BC'
+};
+function is_int(value){ 
+  if((parseFloat(value) == parseInt(value)) && !isNaN(value)){
+      return true;
+  } else { 
+      return false;
+  } 
+}
+function drawPrimeFactorPolygons(value, options) {
+    var apf = primeFactorList(is_int(value)?value:value*2);
+    var pf = Array();
+    var polygons = Array();
+    if(!options) options = defaultOptions;
+    var lastPf=0;
+    for(var i=apf.length-1;i>=0;i--) {
+        pf.push(apf[i]);
+        if((i<apf.length-1&&apf[i+1]!==apf[i]) || i===0) {
+            var nsides = pf[0];
+            var nscount = pf.length;
+            var sangle = 0;
+            pf = Array();
+            // if(nsides===2) {
+            //     if(lastPf===0) nsides=4;
+            //     else {
+            //         nsides = lastPf; 
+            //         sangle = 180 / nsides; 
+            //     }
+            // }
+            lastPf = nsides;
+            var rp = regularPolygon(nsides, 200, sangle, { x : 240, y : 240 });   
+            rp = arrayizePoints(rp);
+            rp.push(false);                    
+            var poly = two.makePolygon.apply(two, rp);
+            poly.fill = options.fill;
+            poly.stroke = options.stroke;
+            polygons.push(poly);
+        }
+    }
+    two.update();    
+    return polygons;
+}
+
+var two;
 $(document).ready(function(){
-    buildScale();
+    buildScales();
+
+    $('.note').click(function(evt) {
+        toggleNote(evt);
+        var cbid = $(evt.target).hasClass('t_frequencies') ? '#z' : '#z2';
+        if(!$(cbid).attr('checked')) {
+            setTimeout(function(){
+                toggleNote(evt);
+            }, 200);
+        }
+    });
 
     $('.rb').click(function(evt) {
         destroyOscillators();
-        buildScale();
+        buildScales();
     });
+
+    two = initTwoSurface('rendercanvas', 480, 480);
+    // var rp = regularPolygon(6, 200, 0, { x : 240, y : 240 });
+
+    // rp = arrayizePoints(rp);
+    // rp.push(false);
+
+    // var poly = two.makePolygon.apply(two, rp);
+
+    // poly.fill = 'rgba(0, 200, 255, 0.75)';
+    // poly.stroke = '#1C75BC';
+
+    // two.update();
 });
-
-
 
 </script>
 </head>
 <body>
     <table id='frequencies' class="unselectable" cellpadding=0 cellspacing=0 border=0>
     </table>
-    <input class="inputfield" id="n" type="text" value="5"/> 
+    <input class="inputfield" id="n" type="text" value="3"/> 
     <input class="inputfield" id="m" type="text" value="2"/> 
-    <input class="inputfield" id="s" type="text" value="11"/>
-    <input class="inputfield" id="o" type="text" value="216"/>
+    <input class="inputfield" id="s" type="text" value="9"/>
+    <input class="inputfield" id="o" type="text" value="108"/>
+    <input class="inputfield" id="z" type="checkbox" checked/>
     <input class="rb" type="button" value="change"/>
     <table id='frequencies2' class="unselectable" cellpadding=0 cellspacing=0 border=0>
     </table>
-    <input class="inputfield" id="n2" type="text" value="5"/> 
+    <input class="inputfield" id="n2" type="text" value="3"/> 
     <input class="inputfield" id="m2" type="text" value="3"/> 
-    <input class="inputfield" id="s2" type="text" value="11"/>
-    <input class="inputfield" id="o2" type="text" value="243"/>
-    <input class="rb" type="button" value="change"/>    
+    <input class="inputfield" id="s2" type="text" value="12"/>
+    <input class="inputfield" id="o2" type="text" value="81"/>
+    <input class="inputfield" id="z2" type="checkbox" checked/>
+    <input class="rb" type="button" value="change"/> 
+    <div class="480wide center clear">
+    <div id="rendercanvas"></div>
+    </div>
 </body>
 </html>

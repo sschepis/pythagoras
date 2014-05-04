@@ -18,7 +18,9 @@ var generatePythagoreanScale = function(octaveCount, octaveDivisions, octaveBase
 		var octaveStep = (nextOctaveRootNote - octaveRootNote) / octaveDivisions;
 		var octout = {
 			octave : octave,
-			base   : octaveRootNote,
+			base   : octaveBase,
+			divs   : octaveDivisions,
+			seed   : octaveRootNote,
 			step   : octaveStep,
 			notes  : Array()	
 		};
@@ -26,7 +28,8 @@ var generatePythagoreanScale = function(octaveCount, octaveDivisions, octaveBase
 			var octaveNote = octaveRootNote + (octaveStep * noteIndex);
 			octout.notes.push({
 				value  : Math.round(octaveNote * 100) / 100,
-				offset : noteIndex +1
+				phase  : Math.round((noteIndex / octaveDivisions)*100)/100,
+				offset : noteIndex + 1
 			});
 		}
 		result.octaves.push(octout);

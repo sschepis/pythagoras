@@ -1,0 +1,68 @@
+.primary-1 { background-color: #00AF64 }
+.primary-2 { background-color: #218359 }
+.primary-3 { background-color: #007241 }
+.primary-4 { background-color: #36D792 }
+.primary-5 { background-color: #61D7A4 }
+
+.secondary-a-1 { background-color: #0B61A4 }
+.secondary-a-2 { background-color: #25567B }
+.secondary-a-3 { background-color: #033E6B }
+.secondary-a-4 { background-color: #3F92D2 }
+.secondary-a-5 { background-color: #66A3D2 }
+
+.secondary-b-1 { background-color: #FF9200 }
+.secondary-b-2 { background-color: #BF8230 }
+.secondary-b-3 { background-color: #A65F00 }
+.secondary-b-4 { background-color: #FFAD40 }
+.secondary-b-5 { background-color: #FFC373 }
+
+.complement-1 { background-color: #FF4900 }
+.complement-2 { background-color: #BF5930 }
+.complement-3 { background-color: #A62F00 }
+.complement-4 { background-color: #FF7640 }
+.complement-5 { background-color: #FF9B73 !important; }
+
+.prime-1 { background-color: #bbb }
+.prime-2 { background-color: #66A3D2 }
+.prime-3 { background-color: #61D7A4 }
+.prime-5 { background-color: #FFC373 }
+.prime-7 { background-color: #FF9B73 }
+.prime-11 { background-color: #C5567B }
+.prime-13 { background-color: #BF8230 }
+ 
+.unselectable {
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+}
+
+.note {
+    width:55px;
+    height:55px;
+}
+
+td {
+    text-align : center;
+}
+
+.note-on {
+    background-color : red !important;
+}
+
+.480wide {
+    width : 480px;
+    height : auto;
+}
+
+.center {
+    margin : 0 auto;
+}
+
+.clear { 
+    clear : both;
+}
+
+#rendercanvas {
+    width:480px;
+    height:480px;
+}
