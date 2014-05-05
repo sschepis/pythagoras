@@ -37,8 +37,8 @@
 }
 
 .note {
-    width:55px;
-    height:55px;
+    width:50px;
+    height:45px;
 }
 
 td {
@@ -54,15 +54,24 @@ td {
     height : auto;
 }
 
-.center {
-    margin : 0 auto;
-}
-
-.clear { 
-    clear : both;
+.960wide {
+    width : 960px;
+    height : auto;
 }
 
 #rendercanvas {
     width:480px;
     height:480px;
 }
+
+body  {
+    margin: 0; 
+    padding: 0;
+    text-align: center;
+    width: 100%;
+}
+
+.container { 
+    margin: 0 auto;
+    display: inline-block;
+} 

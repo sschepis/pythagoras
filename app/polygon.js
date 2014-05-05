@@ -1,6 +1,6 @@
 
 
-var regularPolygon = function(nsides, radius, astart, pstart) {
+var regularPolygon = function(nsides, radius, mirror, astart, pstart) {
  	var result = Array();
  	var i = 0;
  	if(!pstart || !'x' in pstart || !'y' in pstart) 
@@ -11,6 +11,7 @@ var regularPolygon = function(nsides, radius, astart, pstart) {
  			x : ( Math.round(Math.sin(t) * radius * 100) / 100 ) + pstart.x,
  			y : -( Math.round(Math.cos(t) * radius * 100) / 100 ) + pstart.y
  		}
+ 		if(mirror) point.y = -point.y;
  		result.push(point);
  		i++;
  	}
