@@ -12,7 +12,7 @@ var findOscillator = function(freq) {
 var getOscillator = function(freq, phase, play) {
     var oscillator = context.createOscillator();
     oscillator.type = 0;
-    if(window.mobilecheck()==true) {
+    if(false) {
         var real = new Float32Array(4096);
         var imag = new Float32Array(4096);
         var a1 = 0.0;

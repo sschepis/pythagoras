@@ -148,14 +148,17 @@ function drawPrimeFactorPolygons(value, options) {
             else primeFactors[pfactorl] = 1;
         }
     }
+    var mangle = 360;
     if(pow2 != 1) pow2 = multiply_n(2,pow2);
     for(var p=0;p<pow2;p++) {
-        var moffset = p == 0 ? 0 : 360 * ( ( p + 1 ) / pow );
+        var moffset = p == 0 ? 0 : mangle / 2;
+        mangle = mangle / 2;
         var primeFactorKeys = Object.keys(primeFactors);
+        var pangle = 360;
         for(var i=0;i<primeFactorKeys.length;i++) {
             var prime = primeFactorKeys[i];
             var pow = primeFactors[primeFactorKeys[i]];
-            var pangle = 360 / prime;
+            pangle = pangle / prime;
             for(var j=0;j<pow;j++) {
                 var offset = j == 0 ? 0 : pangle / prime * j;
                 var rp = regularPolygon(prime, 200, false, offset + moffset, { x : 240, y : 240 });   
