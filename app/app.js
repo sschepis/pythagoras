@@ -106,6 +106,33 @@ var defaultOptions = {
 };
 
 function drawPrimeFactorPolygons(value, options) {
+    // var apf = primeFactorList(is_int(value)?value:value*2);
+    // var polygons = Array();
+    // if(!options) options = defaultOptions;
+    // var pow = 1;
+    // var pf = Array();
+    // for(var i=apf.length-1;i>=0;i--) {
+    //     pf.push(apf[i]);
+    //     var spangle = i * (360 / pow);
+    //     if((i<apf.length-1&&apf[i+1]!==apf[i])||i===0) {
+    //         var pow2 = pf.length;
+    //         var nsides = pf[0];
+    //         pf = Array();
+    //         for(var j=0;j<pow2;j++) {
+    //             var sangle = j * (360 / pow2);
+    //             var rp = regularPolygon(nsides, 200, sangle, { x : 240, y : 240 });   
+    //             rp = arrayizePoints(rp);
+    //             rp.push(false);                    
+    //             var poly = two.makePolygon.apply(two, rp);
+    //             poly.fill = options.fill;
+    //             poly.stroke = options.stroke;
+    //             polygons.push(poly);
+    //         }
+    //     }
+    // }
+    // two.update();    
+    // return polygons;
+
     var apf = primeFactorList(is_int(value)?value:value*2);
     var polygons = Array();
     if(!options) options = defaultOptions;
@@ -123,15 +150,15 @@ function drawPrimeFactorPolygons(value, options) {
     }
     if(pow2 != 1) pow2 = multiply_n(2,pow2);
     for(var p=0;p<pow2;p++) {
-        var moffset = p * (360 / pow2);
+        var moffset = p == 0 ? 0 : 360 * ( ( p + 1 ) / pow );
         var primeFactorKeys = Object.keys(primeFactors);
         for(var i=0;i<primeFactorKeys.length;i++) {
             var prime = primeFactorKeys[i];
             var pow = primeFactors[primeFactorKeys[i]];
-            var angle = 360 / prime;
+            var pangle = 360 / prime;
             for(var j=0;j<pow;j++) {
-                var offset = j * (angle / pow);
-                var rp = regularPolygon(prime, 200, offset + moffset, false, { x : 240, y : 240 });   
+                var offset = j == 0 ? 0 : pangle / prime * j;
+                var rp = regularPolygon(prime, 200, false, offset + moffset, { x : 240, y : 240 });   
                 rp = arrayizePoints(rp);
                 rp.push(false);                   
                 var fill = 'rgba(200, 0, 255, 0.1)';
@@ -142,7 +169,6 @@ function drawPrimeFactorPolygons(value, options) {
                 poly.fill = fill;
                 poly.stroke = options.stroke;
                 polygons.push(poly);
-
             }
         }
         two.update(); 
