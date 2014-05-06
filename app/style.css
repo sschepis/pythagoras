@@ -22,7 +22,7 @@
 .complement-4 { background-color: #FF7640 }
 .complement-5 { background-color: #FF9B73 !important; }
 
-.prime-1 { background-color: #bbb }
+.prime-1 { background-color: #aaa }
 .prime-2 { background-color: #66A3D2 }
 .prime-3 { background-color: #61D7A4 }
 .prime-5 { background-color: #FFC373 }
@@ -69,7 +69,7 @@ td {
 }
 
 .floatright {
-    float:left;
+    float:right;
 }
 
 body  {
