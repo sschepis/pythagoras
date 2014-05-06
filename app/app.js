@@ -106,78 +106,82 @@ var defaultOptions = {
 };
 
 function drawPrimeFactorPolygons(value, options) {
-    // var apf = primeFactorList(is_int(value)?value:value*2);
-    // var polygons = Array();
-    // if(!options) options = defaultOptions;
-    // var pow = 1;
-    // var pf = Array();
-    // for(var i=apf.length-1;i>=0;i--) {
-    //     pf.push(apf[i]);
-    //     var spangle = i * (360 / pow);
-    //     if((i<apf.length-1&&apf[i+1]!==apf[i])||i===0) {
-    //         var pow2 = pf.length;
-    //         var nsides = pf[0];
-    //         pf = Array();
-    //         for(var j=0;j<pow2;j++) {
-    //             var sangle = j * (360 / pow2);
-    //             var rp = regularPolygon(nsides, 200, sangle, { x : 240, y : 240 });   
-    //             rp = arrayizePoints(rp);
-    //             rp.push(false);                    
-    //             var poly = two.makePolygon.apply(two, rp);
-    //             poly.fill = options.fill;
-    //             poly.stroke = options.stroke;
-    //             polygons.push(poly);
-    //         }
-    //     }
-    // }
-    // two.update();    
-    // return polygons;
-
     var apf = primeFactorList(is_int(value)?value:value*2);
-    var polygons = Array();
     if(!options) options = defaultOptions;
     var primeFactors = {};
-    var pow2 = 1;
-    for(var i=0;i<apf.length;i++) {
+    var pow2 = 0;
+    var polygons = Array();
+    for(var i = 0;i < apf.length; i++) {
         var pfactorl = apf[i] + '';
         if(apf[i] === 2) {
             pow2++;
         } else {
-            if(primeFactors[pfactorl]) 
+            if(pfactorl in primeFactors) 
                 primeFactors[pfactorl] = parseInt(primeFactors[pfactorl]) + 1;
-            else primeFactors[pfactorl] = 1;
+            else {
+                primeFactors[pfactorl] = 1;
+            }
         }
     }
-    var mangle = 360;
-    if(pow2 != 1) pow2 = multiply_n(2,pow2);
-    for(var p=0;p<pow2;p++) {
-        var moffset = p == 0 ? 0 : mangle / 2;
-        mangle = mangle / 2;
-        var primeFactorKeys = Object.keys(primeFactors);
-        var pangle = 360;
+    var opacity = 0;
+    var primeFactorKeys = Object.keys(primeFactors);
+    for(var i=0;i<primeFactorKeys.length;i++) {
+        var pfactor = parseInt(primeFactorKeys[i]);
+        var pfpow = primeFactors[primeFactorKeys[i]];
+        opacity += pfactor * pfpow;
+    }
+    opacity = 1 / opacity;
+
+    var drawNPolygons = function(numsides, num, size, position, options, offset) {
+        var angle = 360 / ( numsides * numsides );
+        var angleOffset = offset;
+        var outpolys = Array();
+        for(var j = 0;j < num;j++) {
+            var rp = regularPolygon(prime, size, false, -angleOffset, position);   
+            rp = arrayizePoints(rp);
+            rp.push(false);                              
+            var poly = two.makePolygon.apply(two, rp);
+            poly.fill = options.fill;
+            poly.stroke = options.stroke;
+            outpolys.push(poly);
+            angleOffset += angle;
+        }
+        return outpolys;
+    }
+    var rgba = function(rgba) {
+        return 'rgba('+rgba.r+', '+rgba.g+', '+rgba.b+', '+rgba.a+')';
+    }
+
+    var niterations = 1;
+    if(pow2 != 0) niterations = multiply_n (1, 2, pow2);
+    var angle_div = 360 / niterations;
+    for(var i = 0 ;i < niterations; i++) {
         for(var i=0;i<primeFactorKeys.length;i++) {
             var prime = primeFactorKeys[i];
-            var pow = primeFactors[primeFactorKeys[i]];
-            pangle = pangle / prime;
-            for(var j=0;j<pow;j++) {
-                var offset = j == 0 ? 0 : pangle / prime * j;
-                var rp = regularPolygon(prime, 200, false, offset + moffset, { x : 240, y : 240 });   
-                rp = arrayizePoints(rp);
-                rp.push(false);                   
-                var fill = 'rgba(200, 0, 255, 0.1)';
-                if(parseInt(prime)===3)  fill = 'rgba(0, 200, 255, 0.1)';
-                else if(parseInt(prime)===5)  fill = 'rgba(0, 255, 0, 0.1)';
-                else if(parseInt(prime)===7)  fill = 'rgba(255, 200, 0, 0.1)';                 
-                var poly = two.makePolygon.apply(two, rp);
-                poly.fill = fill;
-                poly.stroke = options.stroke;
-                polygons.push(poly);
-            }
+            var power = primeFactors[primeFactorKeys[i]];
+            var fill = rgba({r:200,g:0,b:255,a:opacity});
+            var ip = parseInt(prime);
+            if(ip===3)  fill = rgba({r:0,g:200,b:255,a:opacity});
+            else if(ip===5)  fill = rgba({r:0,g:255,b:0,a:opacity});
+            else if(ip===7)  fill = rgba({r:255,g:200,b:0,a:opacity});  
+            var poptions = {
+                fill : fill,
+                stroke : fill// '#1C75BC'
+            };
+            var numpolys = multiply_n(1, prime, power) / prime;
+            var respolys = drawNPolygons(
+                prime, 
+                numpolys, 
+                200, 
+                { x : 240, y : 240 }, 
+                poptions, 
+                angle_div * i);
+            polygons = polygons.concat(respolys);   
         }
         two.update(); 
     }
     return polygons;
-}
+};
 
 var two;
 $(document).ready(function(){
