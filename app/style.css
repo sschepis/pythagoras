@@ -64,6 +64,14 @@ td {
     height:480px;
 }
 
+.floatleft {
+    float:left;
+}
+
+.floatright {
+    float:left;
+}
+
 body  {
     margin: 0; 
     padding: 0;

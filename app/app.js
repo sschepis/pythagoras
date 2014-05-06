@@ -26,13 +26,6 @@ function buildScale(tblid,n,s,m,o,callback) {
                     + value + '</td>';
                 out += notetr;
                 freqbag[freqid] = ret.octaves[i].notes[j];
-                if(j===ret.octaves[i].notes.length-1) {
-                    freqid = ret.octaves[i].notes[0].value * ret.octaves[i].base * 100;
-                    var notetr = '<td class="unselectable note prime-1 t_' 
-                        + tblid + '" id="' + freqid + '">' 
-                        + ret.octaves[i].notes[0].value * ret.octaves[i].base + '</td>';
-                    out += notetr;
-                }
             }
             out += '</tr>';
         }
@@ -41,24 +34,48 @@ function buildScale(tblid,n,s,m,o,callback) {
     });
 }
 
-function toggleNote(evt) {
-    var freq = freqbag[evt.target.id].value;
-    var phase = freqbag[evt.target.id].phase;
-    var state = toggleOscillator(freq, 0);
-    if(state) {
-        $(evt.target).addClass('note-on');
-        freqbag[evt.target.id].polygons = drawPrimeFactorPolygons(freq);
-    }
-    else {
-        $(evt.target).removeClass('note-on');
-        if('polygons' in freqbag[evt.target.id]) {
-            for(var i=0;i<freqbag[evt.target.id].polygons.length;i++)
-                freqbag[evt.target.id].polygons[i].remove();
+function listSimples() {
+        var out = '';
+        for(var i=0;i<4;i++) {
+            out += '<tr>';
+            for(var j=0;j<9;j++) {
+                var classes = Array();
+                var thenum = (i+1) * (j+1);
+                var note = {
+                    offset : i + 1,
+                    phase : 0,
+                    value : (i+1) * (j+1)
+                };
+                if(primeFactorList(thenum).length === 1) {
+                    j--;
+                    continue;
+                }
+
+                var offset = note.offset,
+                    value = note.value,
+                    phase = note.phase;
+                var primefactors = (offset == 1 ? Array() : primeFactorList(offset));
+                if(offset == 1) primefactors.push(1);
+                for(var x=0;x<primefactors.length;x++) {
+                    var pf=primefactors[x];
+                    if(x==0) classes.push('prime-' + pf);
+                    else {
+                        if(primefactors[x-1] !== pf)
+                            classes.push('prime-' + pf);
+                    }
+                }
+                var freqid =  (value * 100) + '';
+                var notetr = '<td class="unselectable note ' 
+                    + classes.join(' ') + ' t_frequencies2" id="' + freqid + '">' 
+                    + value + '</td>';
+                out += notetr;
+                freqbag[freqid] = note;
+            }
+            out += '</tr>';
         }
-        delete oscillators[evt.target.id];
-        two.update();
-    }
+        $('#frequencies2').html(out);
 }
+
 
 function buildScales() {
     var n = parseInt($('#n').val());
@@ -66,6 +83,7 @@ function buildScales() {
     var s = parseInt($('#s').val());
     var o = parseInt($('#o').val());
     buildScale('frequencies',n,m,s,o,function() {
+
 
     n = parseInt($('#n2').val());
     m = parseInt($('#m2').val());
@@ -85,6 +103,28 @@ function buildScales() {
 
     });
 }
+
+function toggleNote(evt) {
+    var freq = freqbag[evt.target.id].value;
+    var phase = freqbag[evt.target.id].phase;
+    var state = toggleFreq(freq, 80);
+    if(state) {
+        $(evt.target).addClass('note-on');
+        setTimeout(function(){
+            freqbag[evt.target.id].polygons = drawPrimeFactorPolygons(freq);
+        }, 10);
+    }
+    else {
+        $(evt.target).removeClass('note-on');
+        if('polygons' in freqbag[evt.target.id]) {
+            for(var i=0;i<freqbag[evt.target.id].polygons.length;i++) {
+                freqbag[evt.target.id].polygons[i].remove();
+            }
+        }
+        two.update();
+    }
+}
+
 
 function initTwoSurface(elid, width, height) {
     var elem = document.getElementById(elid);
@@ -123,28 +163,32 @@ function drawPrimeFactorPolygons(value, options) {
             }
         }
     }
+    var angle_div = 0;
     var opacity = 0;
     var primeFactorKeys = Object.keys(primeFactors);
     for(var i=0;i<primeFactorKeys.length;i++) {
         var pfactor = parseInt(primeFactorKeys[i]);
         var pfpow = primeFactors[primeFactorKeys[i]];
-        opacity += pfactor * pfpow;
+        opacity += pfpow;
     }
+    opacity = opacity + pow2;
     opacity = 1 / opacity;
 
     var drawNPolygons = function(numsides, num, size, position, options, offset) {
-        var angle = 360 / ( numsides * numsides );
+        var angle = 360 / ( num );
         var angleOffset = offset;
         var outpolys = Array();
         for(var j = 0;j < num;j++) {
-            var rp = regularPolygon(prime, size, false, -angleOffset, position);   
+            var rp = regularPolygon(prime, size, false, angleOffset, position);   
             rp = arrayizePoints(rp);
             rp.push(false);                              
             var poly = two.makePolygon.apply(two, rp);
-            poly.fill = options.fill;
-            poly.stroke = options.stroke;
+            poly.fill = rgba(options.fill);
+            poly.stroke = (options.stroke);
             outpolys.push(poly);
             angleOffset += angle;
+            options.fill.a -= options.fill.a / num;
+            //options.stroke.a -= options.stroke.a / numsides * j;
         }
         return outpolys;
     }
@@ -152,32 +196,34 @@ function drawPrimeFactorPolygons(value, options) {
         return 'rgba('+rgba.r+', '+rgba.g+', '+rgba.b+', '+rgba.a+')';
     }
 
-    var niterations = 1;
-    if(pow2 != 0) niterations = multiply_n (1, 2, pow2);
-    var angle_div = 360 / niterations;
-    for(var i = 0 ;i < niterations; i++) {
-        for(var i=0;i<primeFactorKeys.length;i++) {
-            var prime = primeFactorKeys[i];
+    var niterations = pow2 == 0 ? 1 : multiply_n (1, 2, pow2);
+    var curOpacity = opacity;
+    for(var n = 0 ;n < niterations; n++) {
+        for(var i=primeFactorKeys.length-1;i>=0;i--) {
+            var prime = parseInt(primeFactorKeys[i]);
             var power = primeFactors[primeFactorKeys[i]];
-            var fill = rgba({r:200,g:0,b:255,a:opacity});
-            var ip = parseInt(prime);
-            if(ip===3)  fill = rgba({r:0,g:200,b:255,a:opacity});
-            else if(ip===5)  fill = rgba({r:0,g:255,b:0,a:opacity});
-            else if(ip===7)  fill = rgba({r:255,g:200,b:0,a:opacity});  
+            var fill = {r:200,g:0,b:255,a:curOpacity};
+            if(prime===3) fill = {r:0,g:200,b:255,a:curOpacity};
+            else if(prime===5) fill = {r:0,g:255,b:0,a:curOpacity};
+            else if(prime===7) fill = {r:255,g:200,b:0,a:curOpacity};  
             var poptions = {
                 fill : fill,
-                stroke : fill// '#1C75BC'
+                stroke : fill
             };
-            var numpolys = multiply_n(1, prime, power) / prime;
+            poptions.stroke.a = curOpacity;
+
+            var numpolys = multiply_n(1, prime, power);
             var respolys = drawNPolygons(
                 prime, 
                 numpolys, 
                 200, 
                 { x : 240, y : 240 }, 
                 poptions, 
-                angle_div * i);
+                angle_div);
             polygons = polygons.concat(respolys);   
         }
+        angle_div += 360 / multiply_n(1, 2, niterations); //n == 0 ? 0 : 1 / multiply_n (1, 2, n);
+        curOpacity = curOpacity /2;
         two.update(); 
     }
     return polygons;
@@ -188,14 +234,14 @@ $(document).ready(function(){
     buildScales();
 
     $('.rb').click(function(evt) {
-        destroyOscillators();
+        allOff();
         freqbag = {};
         buildScales();
     });
 
     two = initTwoSurface('rendercanvas', 480, 480);
     var circle = two.makeCircle(240, 240, 200);
-    circle.stroke = '#1C75BC';
+    circle.stroke = '#63BAFF';
     two.update();     
 });
 

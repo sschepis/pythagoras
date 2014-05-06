@@ -7,10 +7,13 @@
 <title>Web Audio - Tone Playing Experiment</title>
 <link rel="stylesheet" type="text/css" href="style.css" />
 
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js"></script>
-<script type="text/javascript" src="sound.js"></script>    
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js"></script>
+<script type="text/javascript" src="audiocontext-monkeypatch.js"></script>
+<script type="text/javascript" src="webmidiapi.js"></script>
+<script type="text/javascript" src="webaudioapi.js"></script>  
 <script type="text/javascript" src="octave.js"></script>  
-<script type="text/javascript" src="oscillator.js"></script>  
+<script type="text/javascript" src='webmidiapi.js'></script>
+<script type="text/javascript" src="midi.js"></script>
 <script type="text/javascript" src="primefactor.js"></script>  
 <script type="text/javascript" src="touchpunch.js"></script>  
 <script type="text/javascript" src="two.js"></script>      
@@ -20,26 +23,29 @@
 </head>
 <body class="bodyclass">
     <div class="container 960wide">
-    <div id="rendercanvas"></div>
+    <div class="480wide floatleft">
+    Info
+    </div>
+    <div class="480wide floatright" id="rendercanvas"></div>
     </div>
 
     <div class="container 960wide">
     <table id='frequencies' class="unselectable" cellpadding=0 cellspacing=0 border=0>
     </table>
-    <input class="inputfield" id="n" type="text" value="2"/> 
+    <input class="inputfield" id="n" type="text" value="3"/> 
     <input class="inputfield" id="m" type="text" value="2"/> 
-    <input class="inputfield" id="s" type="text" value="8"/>
-    <input class="inputfield" id="o" type="text" value="108"/>
+    <input class="inputfield" id="s" type="text" value="16"/>
+    <input class="inputfield" id="o" type="text" value="216"/>
     <input class="inputfield" id="z" type="checkbox" checked/>
     <input class="rb" type="button" value="change"/>
-    <table id='frequencies2' class="unselectable" cellpadding=0 cellspacing=0 border=0>
-    </table>
-    <input class="inputfield" id="n2" type="text" value="2"/> 
-    <input class="inputfield" id="m2" type="text" value="3"/> 
-    <input class="inputfield" id="s2" type="text" value="12"/>
-    <input class="inputfield" id="o2" type="text" value="81"/>
-    <input class="inputfield" id="z2" type="checkbox" checked/>
-    <input class="rb" type="button" value="change"/> 
+<!--     <table id='frequencies2' class="unselectable" cellpadding=0 cellspacing=0 border=0>
+    </table> -->
+<!--     <input class="inputfield" id="n2" type="text" value="3"/> 
+    <input class="inputfield" id="m2" type="text" value="2"/> 
+    <input class="inputfield" id="s2" type="text" value="16"/>
+    <input class="inputfield" id="o2" type="text" value="324"/>
+    <input class="inputfield" id="z2" type="checkbox" checked/>    
+    <input class="rb" type="button" value="change"/>   -->  
     </div>
 </body>
 </html>

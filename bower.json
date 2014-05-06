@@ -3,10 +3,12 @@
   "description": "E.g. Seed project to get started with Famo.us.",
   "version": "0.1.0",
   "homepage": "https://github.com/sschepis/famous-base",
-  "authors": [{
-    "name": "CoderBoo",
-    "url": "http://github.com/sschepis/"
-  }],
+  "authors": [
+    {
+      "name": "CoderBoo",
+      "url": "http://github.com/sschepis/"
+    }
+  ],
   "main": "app/index.html",
   "moduleType": [
     "amd"
@@ -27,6 +29,10 @@
     "requirejs": "~2.1.11",
     "almond": "~0.2.9",
     "famous-polyfills": "git+https://github.com/Famous/polyfills.git#0.1.1",
-    "famous": "git+https://github.com/Famous/famous.git#0.1.2"
+    "famous": "git+https://github.com/Famous/famous.git#0.1.2",
+    "polymer": "~0.2.3",
+    "polymer-platform": "~0.2.3",
+    "polymer-eventemitter": "~0.0.1",
+    "polymer-localstorage": "https://github.com/addyosmani/polymer-localstorage"
   }
 }

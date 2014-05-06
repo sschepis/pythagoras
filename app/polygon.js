@@ -9,7 +9,7 @@ var regularPolygon = function(nsides, radius, mirror, astart, pstart) {
  		var t = 2 * Math.PI * (i / nsides) + astart;
  		var point = {
  			x : ( Math.round(Math.sin(t) * radius * 100) / 100 ) + pstart.x,
- 			y : -( Math.round(Math.cos(t) * radius * 100) / 100 ) + pstart.y
+ 			y : ( Math.round(Math.cos(t) * radius * 100) / 100 ) + pstart.y
  		}
  		if(mirror) point.y = -point.y;
  		result.push(point);
