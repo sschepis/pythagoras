@@ -171,12 +171,13 @@ function drawPrimeFactorPolygons(value, options) {
         var pfpow = primeFactors[primeFactorKeys[i]];
         opacity += pfpow;
     }
-    opacity = 0.1;
+    opacity = 0.5;
 
     var drawNPolygons = function(numsides, num, size, position, options, offset) {
-        var angle = 360 / ( num );
+        var angle = (360 /  num);
         var angleOffset = offset;
         var outpolys = Array();
+        var fillamt = options.fill.a;
         for(var j = 0;j < num;j++) {
             var rp = regularPolygon(prime > 21 ? 2 : prime, size, false, angleOffset, position);   
             rp = arrayizePoints(rp);
@@ -186,8 +187,7 @@ function drawPrimeFactorPolygons(value, options) {
             poly.stroke = rgba(options.stroke);
             outpolys.push(poly);
             angleOffset += angle;
-            options.fill.a -= options.fill.a / num;
-            options.stroke.a -= options.stroke.a / numsides;
+            options.fill.a -= fillamt / num*2;
         }
         return outpolys;
     }
@@ -197,36 +197,37 @@ function drawPrimeFactorPolygons(value, options) {
 
     var niterations = pow2 == 0 ? 1 : multiply_n (1, 2, pow2);
     var curOpacity = opacity;
-    for(var n = 0 ;n < niterations; n++) {
-        for(var i=primeFactorKeys.length-1;i>=0;i--) {
-            var prime = parseInt(primeFactorKeys[i]);
-            var power = primeFactors[primeFactorKeys[i]];
-            var fill = {r:51,g:255,b:102,a:curOpacity};
-            if(prime===3) fill = {r:51,g:102,b:255,a:curOpacity};
-            else if(prime===5) fill = {r:102,g:51,b:255,a:curOpacity};
-            else if(prime===7) fill = {r:204,g:51,b:255,a:curOpacity};  
-            else if(prime===11) fill = {r:255,g:51,b:204,a:curOpacity};  
-            else if(prime===13) fill = {r:255,g:51,b:102,a:curOpacity};  
-            var poptions = {
-                fill : fill,
-                stroke : fill
-            };
-            poptions.stroke.a = 0.1;//curOpacity * 2;
 
-            var numpolys = multiply_n(1, prime, power);
-            var respolys = drawNPolygons(
-                prime, 
-                numpolys, 
-                200, 
-                { x : 240, y : 240 }, 
-                poptions, 
-                angle_div);
-            polygons = polygons.concat(respolys);   
-        }
-        angle_div += 360 / multiply_n(1, 2, niterations);
-        curOpacity = curOpacity * 0.5;
-        two.update(); 
+    for(var i=primeFactorKeys.length-1;i>=0;i--) {
+        var prime = parseInt(primeFactorKeys[i]);
+        var power = primeFactors[primeFactorKeys[i]];
+        var fill = {r:51,g:255,b:102,a:curOpacity};
+        if(prime===3) fill = {r:51,g:102,b:255,a:curOpacity};
+        else if(prime===5) fill = {r:102,g:51,b:255,a:curOpacity};
+        else if(prime===7) fill = {r:204,g:51,b:255,a:curOpacity};  
+        else if(prime===11) fill = {r:255,g:51,b:204,a:curOpacity};  
+        else if(prime===13) fill = {r:255,g:51,b:102,a:curOpacity};  
+        var poptions = {
+            fill : fill,
+            stroke : fill
+        };
+        poptions.fill.a = 1;
+        poptions.stroke.a = prime > 840 ? 0.08 : 0.16;
+        poptions.stroke.a = prime < 210 ? 0.32 : poptions.stroke.a;
+        poptions.stroke.a = prime > 1680 ? 0.02 : poptions.stroke.a;
+
+        var numpolys = multiply_n(1, 2, power) * niterations;
+        var respolys = drawNPolygons(
+            prime, 
+            numpolys, 
+            200, 
+            { x : 240, y : 240 }, 
+            poptions, 
+            0);
+        polygons = polygons.concat(respolys);   
     }
+    two.update(); 
+
     return polygons;
 };
 
