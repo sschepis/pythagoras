@@ -5,17 +5,19 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Oscilloscope and Pulse-Width control</title>
     <style>
-      body { margin: 1em;}
+      body { margin: 1em; background-color:#000;}
       p { margin: 1em 0;}
       #output {
         width: 512px;
         height: 256px;
       }
       canvas {
-        border:  3px solid gray;
-        border-radius: 15px;
+        border:  2px solid gray;
+        border-radius: 5px;
         background: teal;
-        box-shadow: 7px 10px 5px black;
+      } 
+      .dutycycle {
+        width : 128px;
       }
     </style>
     <script src="scope-ui.js"></script>
@@ -25,6 +27,7 @@
   <body>
   <p>This demo shows two things - an "oscilloscope control", complete with zero-triggered sweep built in, and an attempt to provide a controlled-duty-cycle pulse width modulation by mixing two sawtooth waves with a controlled delay (and a dc offset correction).</p>
     <p><button onclick="pushme();">Be quiet!</button></p>
-    <p>Duty cycle control: <input id="dutycycle" type="range" value="0.5" min="0.0" max="1.0" step="0.01" onchange="dutycyclechange()" oninput="dutycyclechange()"></p>
+    <p><input id="dutycycle" type="range" value="1" min="0.125" max="8" step="0.125" onchange="dutycyclechange()" oninput="dutycyclechange()">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input id="frequency" type="range" value="432" min="9" max="13824" step="1" onchange="frequencychange()" oninput="frequencychange()"><br/><button onclick="scale = 1; document.getElementById('samplesize').value = totalWindow;">Reset</button>
+    <input onChange="scale=document.getElementById('samplesize').value;" value="1" id='samplesize'/><input value="432" onChange="frequencychange()" id='freqvalue'/></p>
   </body>
 </html>

@@ -40,5 +40,13 @@ function init(){
 window.addEventListener("load", init );
 
 function dutycyclechange() {
-  pwmOsc.setDutyCycle(1-parseFloat(document.getElementById("dutycycle").value));
+  scale = document.getElementById("dutycycle").value;
+  document.getElementById("samplesize").value = scale;
+  
+}
+
+function frequencychange() {
+  var freqval = document.getElementById("frequency").value;
+  osc1.frequency.value = freqval;
+  document.getElementById('freqvalue').value = freqval;
 }

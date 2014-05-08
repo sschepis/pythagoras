@@ -4,55 +4,39 @@ function Oscilloscope(analyser,width,height) {
 	this.width = width;
 	this.height = height;
 }
+var scale = 1;
+var totalWindow;
+var zeroCross;
 
 Oscilloscope.prototype.draw = function (context) {
 	var data = this.data;
 	var quarterHeight = this.height/4;
-	var scaling = this.height/256;
+	var scaling = this.height/(this.height);
 
 	this.analyser.getByteTimeDomainData(data);
-	context.strokeStyle = "red";
-	context.lineWidth = 1;
-	context.fillStyle="#004737";
+	var yoffset = 128;
+
+	context.fillStyle="#000000";
 	context.fillRect(0,0,this.width, this.height);
+	
+	context.strokeStyle = "#000000";
 	context.beginPath();
-	context.moveTo(0,0);
-	context.lineTo(this.width,0);
-	context.stroke();
-	context.moveTo(0,this.height);
-	context.lineTo(this.width,this.height);
-	context.stroke();
-	context.save();
-	context.strokeStyle = "#006644";
-	context.beginPath();
-	if (context.setLineDash)
-		context.setLineDash([5]);
-	context.moveTo(0,quarterHeight);
-	context.lineTo(this.width,quarterHeight);
-	context.stroke();
-	context.moveTo(0,quarterHeight*3);
-	context.lineTo(this.width,quarterHeight*3);
-	context.stroke();
+	//context.moveTo(128,((256-data[0])*scaling));
 
-	context.restore();
-	context.beginPath();
-	context.strokeStyle = "blue";
-	context.moveTo(0,quarterHeight*2);
-	context.lineTo(this.width,quarterHeight*2);
-	context.stroke();
-
-	context.strokeStyle = "white";
-
-	context.beginPath();
-	context.moveTo(0,(256-data[0])*scaling);
-
-	var zeroCross = findFirstPositiveZeroCrossing(data, this.width);
+	zeroCross = findFirstPositiveZeroCrossing(data, this.width);
 	if (zeroCross==0)
 		zeroCross=1;
 
-	for (var i=zeroCross, j=0; (j<(this.width+zeroCross)&&(i<data.length)); i++, j++)
-		context.lineTo(j,(256-data[i])*scaling);
-
+	context.strokeStyle = "#1C75BC";
+	
+	totalWindow = data.length;
+	for (var i=zeroCross, j=0; j < this.width + zeroCross && i<data.length; i++, j++) {
+		var distance = ((256-data[i])*scaling);
+		var angle = (4 * scale) * j;
+		var x = distance * Math.cos(angle) + 256;
+		var y = distance * Math.sin(angle) + 256;
+		context.lineTo(x,y);
+	}		
 	context.stroke();
 }
 

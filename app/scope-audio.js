@@ -3,18 +3,16 @@ var myBuffer = null;
 
 var osc = null;
 function setDutyCycle(amt) {
-	this.delay.delayTime.value = amt/this.frequency;	
-	this.dcGain.gain.value = 1.7*(0.5-amt);
+	//this.delay.delayTime.value = amt/this.frequency;	
+	//this.dcGain.gain.value = 1.7*(0.5-amt);
 }
 function start(time) {
 	this.osc1.start(time);
-	this.osc2.start(time);
-	this.dcOffset.start(time);
+	//this.dcOffset.start(time);
 }
 function stop(time) {
 	this.osc1.stop(time);
-	this.osc2.stop(time);
-	this.dcOffset.stop(time);
+	//this.dcOffset.stop(time);
 }
 
 function createDCOffset() {
@@ -28,45 +26,43 @@ function createDCOffset() {
 	return bufferSource;
 }
 
+var osc1;
+
 function createPWMOsc(freq, dutyCycle) {
 	var pwm = new Object();
-	var osc1 = audioContext.createOscillator();
-	var osc2 = audioContext.createOscillator();
-	var inverter = audioContext.createGain();
+	osc1 = audioContext.createOscillator();
+	// var inverter = audioContext.createGain();
 	var output = audioContext.createGain();
-	var delay = audioContext.createDelay();
-	inverter.gain.value=-1;
+	// var delay = audioContext.createDelay();
+	// inverter.gain.value=-1;
 	osc1.type="sine";
-	osc2.type="sine";
-	osc1.frequency.value=freq;
 	osc1.frequency.value=freq;
 	osc1.connect(output);
-	osc2.connect(inverter);
-	inverter.connect(delay);
-	delay.connect(output);
-	var dcOffset = createDCOffset();
-	var dcGain = audioContext.createGain();
-	dcOffset.connect(dcGain);
-	dcGain.connect(output);
+	// inverter.connect(delay);
+	// delay.connect(output);
+	// var dcOffset = createDCOffset();
+	// var dcGain = audioContext.createGain();
+	// dcOffset.connect(dcGain);
+	// dcGain.connect(output);
 
 	output.gain.value = 0.5;  // purely for debugging.
 
 	pwm.osc1=osc1;
-	pwm.osc2=osc2;
 	pwm.output=output;
-	pwm.delay=delay;
+	// pwm.delay=delay;
 	pwm.frequency = freq;
-	pwm.dcGain=dcGain;
-	pwm.dcOffset=dcOffset;
-	pwm.setDutyCycle = setDutyCycle;
+	//pwm.dcGain=dcGain;
+	//pwm.dcOffset=dcOffset;
+//	pwm.setDutyCycle = setDutyCycle;
 	pwm.start=start;
 	pwm.stop=stop;
 
-	pwm.setDutyCycle(dutyCycle);
+	//pwm.setDutyCycle(dutyCycle);
 	return pwm;
 }
 
 var pwmOsc;
+var sampleFreq;
 
 function setupAudio( obj ) {
 	window.AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -75,18 +71,14 @@ function setupAudio( obj ) {
 	obj.analyser = audioContext.createAnalyser();
 	obj.analyser.fftSize = 2048;
 
-	myOscilloscope = new Oscilloscope(obj.analyser, 512, 256);
+	myOscilloscope = new Oscilloscope(obj.analyser, 512, 512);
 
-/*
-	osc = audioContext.createOscillator();
-	osc.type = "sawtooth";
-	*/
-
-	pwmOsc=createPWMOsc(432,0);
+	sampleFreq = 243;
+	pwmOsc=createPWMOsc(sampleFreq,0);
 
 	pwmOsc.output.connect(audioContext.destination);
 	pwmOsc.output.connect(obj.analyser);
-	pwmOsc.start(audioContext.currentTime+0.05);
+	pwmOsc.start(audioContext.currentTime);
 
 /*
 	var request = new XMLHttpRequest();
