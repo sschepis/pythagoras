@@ -50,3 +50,9 @@ function frequencychange() {
   osc1.frequency.value = freqval;
   document.getElementById('freqvalue').value = freqval;
 }
+
+function freqvalchange() {
+  var freqval = document.getElementById("freqvalue").value;
+  osc1.frequency.value = freqval;
+  document.getElementById('frequency').value = freqval;
+}
