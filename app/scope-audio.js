@@ -1,68 +1,86 @@
 var audioContext = null;
 var myBuffer = null;
-
 var osc = null;
-function setDutyCycle(amt) {
-	//this.delay.delayTime.value = amt/this.frequency;	
-	//this.dcGain.gain.value = 1.7*(0.5-amt);
+var myOscilloscope = null;
+var myCanvas = null;
+var sampleFreq = 432;
+var pwmOsc = null;
+var rafID;
+
+// shim layer with setTimeout fallback
+window.requestAnimationFrame = window.requestAnimationFrame ||
+  window.webkitRequestAnimationFrame;
+
+function draw() {  
+  if (myOscilloscope)
+    myOscilloscope.draw(myCanvas.myContext);
+  rafID = requestAnimationFrame( draw );
 }
+
+function setupScopeCanvas( canvas ) {
+  canvas.myContext = canvas.getContext( '2d' );
+  return canvas;
+}
+
+function init(){
+  myCanvas = setupScopeCanvas(document.getElementById("scope"));
+  setupAudio( myCanvas );
+  draw.bind ( myCanvas )();
+}
+
+window.addEventListener("load", init);
+
+function xscalechange() {
+  scale = document.getElementById("dutycycle").value;
+  myOscilloscope.xscaling = scale;
+  document.getElementById("samplesize").value = scale;
+}
+
+function gainchange() {
+  gain = document.getElementById("gain").value;
+  pwmOsc.output.gain.value= gain;
+  document.getElementById("gaintext").value = gain;
+}
+
+function frequencychange() {
+  var freqval = document.getElementById("frequency").value;
+  osc.frequency.value = freqval;
+  document.getElementById('freqvalue').value = freqval;
+}
+
+function freqvalchange() {
+  var freqval = document.getElementById("freqvalue").value;
+  osc.frequency.value = freqval;
+  document.getElementById('frequency').value = freqval;
+}
+
 function start(time) {
 	this.osc1.start(time);
-	//this.dcOffset.start(time);
 }
 function stop(time) {
 	this.osc1.stop(time);
-	//this.dcOffset.stop(time);
 }
-
-function createDCOffset() {
-	var buffer=audioContext.createBuffer(1,1024,audioContext.sampleRate);
-	var data = buffer.getChannelData(0);
-	for (var i=0; i<1024; i++)
-		data[i]=1.0;
-	var bufferSource=audioContext.createBufferSource();
-	bufferSource.buffer=buffer;
-	bufferSource.loop=true;
-	return bufferSource;
-}
-
-var osc1;
 
 function createPWMOsc(freq, dutyCycle) {
 	var pwm = new Object();
-	osc1 = audioContext.createOscillator();
-	// var inverter = audioContext.createGain();
+	osc = audioContext.createOscillator();
 	var output = audioContext.createGain();
-	// var delay = audioContext.createDelay();
-	// inverter.gain.value=-1;
-	osc1.type="sine";
-	osc1.frequency.value=freq;
-	osc1.connect(output);
-	// inverter.connect(delay);
-	// delay.connect(output);
-	// var dcOffset = createDCOffset();
-	// var dcGain = audioContext.createGain();
-	// dcOffset.connect(dcGain);
-	// dcGain.connect(output);
 
-	output.gain.value = 0.5;  // purely for debugging.
+	osc.type="sine";
+	osc.frequency.value=freq;
+	osc.connect(output);
 
-	pwm.osc1=osc1;
+	output.gain.value = 0.5;
+
+	pwm.osc1=osc;
 	pwm.output=output;
-	// pwm.delay=delay;
 	pwm.frequency = freq;
-	//pwm.dcGain=dcGain;
-	//pwm.dcOffset=dcOffset;
-//	pwm.setDutyCycle = setDutyCycle;
+
 	pwm.start=start;
 	pwm.stop=stop;
 
-	//pwm.setDutyCycle(dutyCycle);
 	return pwm;
 }
-
-var pwmOsc;
-var sampleFreq;
 
 function setupAudio( obj ) {
 	window.AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -73,24 +91,9 @@ function setupAudio( obj ) {
 
 	myOscilloscope = new Oscilloscope(obj.analyser, 512, 512);
 
-	sampleFreq = 243;
-	pwmOsc=createPWMOsc(sampleFreq,0);
+	pwmOsc = createPWMOsc(sampleFreq, 0);
 
 	pwmOsc.output.connect(audioContext.destination);
 	pwmOsc.output.connect(obj.analyser);
 	pwmOsc.start(audioContext.currentTime);
-
-/*
-	var request = new XMLHttpRequest();
-	request.open("GET", "sounds/techno.wav", true);
-	request.responseType = "arraybuffer";
-	request.onload = function() {
-	  audioContext.decodeAudioData( request.response, function(buffer) { 
-	    	myBuffer = buffer;
-	    	appendOutput( "Sound ready." );
-		} );
-	}
-	request.send();
-*/
-
 }

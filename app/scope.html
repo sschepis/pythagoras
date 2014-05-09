@@ -7,27 +7,31 @@
     <style>
       body { margin: 1em; background-color:#000;}
       p { margin: 1em 0;}
+      #scope {
+        border:  2px solid gray;
+        border-radius: 5px;
+        background: #000;
+        width: 512px;
+        height: 512px;
+      } 
       #output {
         width: 512px;
         height: 256px;
       }
-      canvas {
-        border:  2px solid gray;
-        border-radius: 5px;
-        background: teal;
-      } 
-      .dutycycle {
-        width : 128px;
-      }
     </style>
-    <script src="scope-ui.js"></script>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js"></script>
     <script src="scope-audio.js"></script>
     <script src="oscilloscope.js"></script>
   </head>
   <body>
-  <p>This demo shows two things - an "oscilloscope control", complete with zero-triggered sweep built in, and an attempt to provide a controlled-duty-cycle pulse width modulation by mixing two sawtooth waves with a controlled delay (and a dc offset correction).</p>
-    <p><button onclick="pushme();">Be quiet!</button></p>
-    <p><input id="dutycycle" type="range" value="1" min="0.125" max="8" step="0.125" onchange="dutycyclechange()" oninput="dutycyclechange()">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input id="frequency" type="range" value="432" min="9" max="3360" step="1" onchange="frequencychange()" oninput="frequencychange()"><br/><button onclick="scale = 1; document.getElementById('samplesize').value = totalWindow;">Reset</button>
-    <input onChange="scale=document.getElementById('samplesize').value;" value="1" id='samplesize'/><input value="432" onChange="freqvalchange()" id='freqvalue'/></p>
+    <input id="dutycycle" type="range" value="1" min="0.125" max="8" step="0.125" onchange="xscalechange()" oninput="xscalechange()">
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <input id="frequency" type="range" value="432" min="9" max="3360" step="1" onchange="frequencychange()" oninput="frequencychange()">
+    <input id="gain" type="range" value="0.5" min="0.05" max="1" step="0.05" onchange="gainchange()" oninput="gainchange()"><br/>
+    <button onclick="myOscilloscope.xscaling=1;document.getElementById('samplesize').value=1">Reset</button>
+    <input onChange="myOscilloscope.xscaling=document.getElementById('samplesize').value" value="1" id='samplesize'/>
+    <input value="432" onChange="freqvalchange()" id='freqvalue'/>
+    <input onChange="pwmOsc.output.gain.value=document.getElementById('gaintext').value" value="0.5" id='gaintext'/></p>
+    <canvas width="512" height="512" id='scope'></canvas>
   </body>
 </html>
