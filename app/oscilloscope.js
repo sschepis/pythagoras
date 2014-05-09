@@ -1,48 +1,16 @@
-function Oscilloscope(analyser,width,height) {
+function Oscilloscope(analyser, width, height) {
 	this.analyser = analyser;
 	this.data = new Uint8Array(analyser.frequencyBinCount);
 	this.width = width;
 	this.height = height;
-}
-var scale = 1;
-var totalWindow;
-var zeroCross;
-
-Oscilloscope.prototype.draw = function (context) {
-	var data = this.data;
-	var quarterHeight = this.height/4;
-	var scaling = this.height/(this.height);
-
-	this.analyser.getByteTimeDomainData(data);
-	var yoffset = 128;
-
-	context.fillStyle="#000000";
-	context.fillRect(0,0,this.width, this.height);
-	
-	context.strokeStyle = "#000000";
-	context.beginPath();
-	//context.moveTo(128,((256-data[0])*scaling));
-
-	zeroCross = findFirstPositiveZeroCrossing(data, this.width);
-	if (zeroCross==0)
-		zeroCross=1;
-
-	context.strokeStyle = "#1C75BC";
-	
-	totalWindow = data.length;
-	for (var i=zeroCross, j=0; j < this.width + zeroCross && i<data.length; i++, j++) {
-		var distance = ((256-data[i])*scaling);
-		var angle = (4 * scale) * j;
-		var x = distance * Math.cos(angle) + 256;
-		var y = distance * Math.sin(angle) + 256;
-		context.lineTo(x,y);
-	}		
-	context.stroke();
+	this.xscaling = 1;
+	this.yscaling = 1;
+	this.minval = (this.height/4) + 8;
+	this.totalWindow = 0;
+	this.zeroCross = 0;
 }
 
-var MINVAL = 134;  // 128 == zero.  MINVAL is the "minimum detected signal" level.
-
-function findFirstPositiveZeroCrossing(buf, buflen) {
+Oscilloscope.prototype.findFirstPositiveZeroCrossing = function(buf, buflen) {
   var i = 0;
   var last_zero = -1;
   var t;
@@ -55,7 +23,7 @@ function findFirstPositiveZeroCrossing(buf, buflen) {
     return 0;
 
   // advance until we're above MINVAL, keeping track of last zero.
-  while (i<buflen && ((t=buf[i]) < MINVAL )) {
+  while (i<buflen && ((t=buf[i]) < this.minval )) {
     if (t >= 128) {
       if (last_zero == -1)
         last_zero = i;
@@ -76,5 +44,36 @@ function findFirstPositiveZeroCrossing(buf, buflen) {
     return 0;
 
   return last_zero;
+}
+
+
+Oscilloscope.prototype.draw = function (context) {
+	var data = this.data;
+	var halfHeight = this.height/2;
+	var quarterHeight = this.height/4;
+
+	this.analyser.getByteTimeDomainData(data);
+
+	context.strokeStyle = "#000000";
+	context.fillStyle="#000000";
+	context.fillRect(0,0, this.width, this.height);	
+
+	context.beginPath();
+
+	this.zeroCross = this.findFirstPositiveZeroCrossing(data, this.width);
+	if (this.zeroCross==0)
+		this.zeroCross=1;
+
+	context.strokeStyle = "#1C75BC";
+	
+	this.totalWindow = data.length;
+	for (var i=this.zeroCross, j=0; j < this.width + this.zeroCross && i<data.length; i++, j++) {
+		var distance = ((halfHeight - data[i]) * this.yscaling);
+		var angle = (4 * this.xscaling) * j;
+		var x = distance * Math.cos(angle) + halfHeight;
+		var y = distance * Math.sin(angle) + halfHeight;
+		context.lineTo(x,y);
+	}		
+	context.stroke();
 }
 
