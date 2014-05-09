@@ -1,17 +1,17 @@
  <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, maximum-scale=1, user-scalable=no" />
+<meta name="viewport" content="width=device-width, maximum-scale=1, user-scalable=yes" />
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black" />
 <title>Web Audio - Tone Playing Experiment</title>
 <link rel="stylesheet" type="text/css" href="style.css" />
+<link href='http://fonts.googleapis.com/css?family=Oswald' rel='stylesheet' type='text/css'>
 
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js"></script>
 <script type="text/javascript" src="audiocontext-monkeypatch.js"></script>
-<script type="text/javascript" src="webmidiapi.js"></script>
-<script type="text/javascript" src="webaudioapi.js"></script>
 <script type="text/javascript" src="oscilloscope.js"></script> 
+<script type="text/javascript" src="webaudioapi.js"></script>
 <script type="text/javascript" src="octave.js"></script>  
 <script type="text/javascript" src="primefactor.js"></script>  
 <script type="text/javascript" src="touchpunch.js"></script>  
@@ -23,13 +23,18 @@
 <body class="bodyclass">
     <div class="container 960wide">
         <div class="480wide floatleft" id="rendercanvas"></div>
-        <canvas class="480wide floatright" id="scopecanvas">
+        <canvas class="480wide floatright" width="440" height="440" id="scopecanvas">
         </div>
     </div>
-    <div class="container 960wide">
-    <table id='frequencies' class="unselectable" cellpadding=0 cellspacing=0 border=0>
+    <div class="container 960wide" >
+    X Scaling&nbsp;:&nbsp;<input onChange="xscaletextchange()" value="0.325" id='xscaletext'/>&nbsp;&nbsp;&nbsp;&nbsp;
+    <input id="xscale" type="range" class="range" value="0.325" min="0.025" max="4" step="0.0125" onchange="xscalechange()" oninput="xscalechange()">
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <input id="gain" type="range" class="range" value="0.5" min="0.05" max="1" step="0.05" onchange="gainchange()" oninput="gainchange()">&nbsp;&nbsp;&nbsp;&nbsp;
+    <input id='gaintext' onChange="gaintextchange()" value="0.5"/>&nbsp;:&nbsp;Gain<br/>
+    <table id='frequencies' style="margin-top:20px" class="unselectable" cellpadding=0 cellspacing=0 border=0>
     </table>
-    <input class="inputfield" id="n" type="text" value="6"/> 
+    <input class="inputfield" id="n" type="text" style="margin-top:20px" value="6"/> 
     <input class="inputfield" id="m" type="text" value="2"/> 
     <input class="inputfield" id="s" type="text" value="18"/>
     <input class="inputfield" id="o" type="text" value="27"/>

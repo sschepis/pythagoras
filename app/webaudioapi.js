@@ -40,7 +40,24 @@ var revNode = null;
 var revGain = null;
 var revBypassGain = null;
 
-function initAudio() {
+var rafID;
+var oscilloscope = null;
+var oscCanvas = null;
+
+function draw() {  
+  if (oscilloscope && oscCanvas)
+     oscilloscope.draw(oscCanvas.oscContext);
+  rafID = requestAnimationFrame( draw );
+}
+
+function setupScope(canvas) {
+    canvas.analyser = audioContext.createAnalyser();
+    canvas.analyser.fftSize = 2048;
+    oscilloscope = new Oscilloscope(canvas.analyser, 440, 440);
+    return canvas;
+}
+
+function initAudio(callback) {
     try {
         audioContext = new webkitAudioContext();
     }
@@ -65,18 +82,28 @@ function initAudio() {
 
     // overall volume control node
     volNode = audioContext.createGain();
-    volNode.gain.value = 0.25;
+    volNode.gain.value = 0.5;
 
     effectChain.connect( revNode );
     effectChain.connect( revBypassGain );
+
     revNode.connect( revGain );
     revGain.connect( volNode );
     revBypassGain.connect( volNode );
 
     // hook it up to the "speakers"
     volNode.connect( audioContext.destination );
+
+    // setup the scope
+    oscCanvas = setupScope(document.getElementById("scopecanvas"));
+    oscCanvas.oscContext = oscCanvas.getContext( '2d' );
+    draw.bind ( oscCanvas )();
+
+    //connect our volnode to the scope
+    volNode.connect ( oscCanvas.analyser );
+
+    if(callback) callback();
 }
-window.onload=initAudio;
 
 var findOscillator = function(freq) {
     for(var i=0;i<oscillators.length;i++) {
@@ -202,7 +229,6 @@ Voice.prototype.noteOff = function() {
         0.0, 
         now, 
         (currentEnvR/100));
-
     this.osc.stop( release );
 }
 

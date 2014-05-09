@@ -1,13 +1,3 @@
-var rafID;
-var oscilloscope = null;
-var oscCanvas = null;
-
-function draw() {  
-  if (oscilloscope && oscCanvas)
-    oscilloscope.draw(oscCanvas.myContext);
-  rafID = requestAnimationFrame( draw );
-}
-
 var freqbag = {};
 function buildScale(tblid,n,s,m,o,callback) {
     generatePythagoreanScale(n,m,s,o,function(err,ret){
@@ -255,7 +245,10 @@ $(document).ready(function(){
     two = initTwoSurface('rendercanvas', 480, 480);
     var circle = two.makeCircle(240, 240, 220);
     circle.stroke = '#000';
+    circle.fill = '#000';
     two.update();     
+
+    initAudio();
 });
 
 function getClassStyles(parentElem, selector, style){
@@ -278,6 +271,28 @@ function getStyleSheetPropertyValue(selectorText, propertyName) {
         }
     }
     return null;
+}
+
+function xscalechange() {
+  scale = document.getElementById("xscale").value;
+  document.getElementById("xscaletext").value = scale;
+  oscilloscope.xscaling = scale;
+}
+function xscaletextchange() {
+  scale = document.getElementById("xscaletext").value;
+  document.getElementById("xscale").value = scale;
+  oscilloscope.xscaling = scale;
+}
+
+function gainchange() {
+  gain = document.getElementById("gain").value;
+  document.getElementById("gaintext").value = gain;
+  volNode.gain.value= gain;
+}
+function gaintextchange() {
+  gain = document.getElementById("gaintext").value;
+  document.getElementById("gain").value = gain;
+  volNode.gain.value= gain;
 }
 
 window.mobilecheck = function() {
