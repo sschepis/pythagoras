@@ -1,3 +1,13 @@
+var rafID;
+var oscilloscope = null;
+var oscCanvas = null;
+
+function draw() {  
+  if (oscilloscope && oscCanvas)
+    oscilloscope.draw(oscCanvas.myContext);
+  rafID = requestAnimationFrame( draw );
+}
+
 var freqbag = {};
 function buildScale(tblid,n,s,m,o,callback) {
     generatePythagoreanScale(n,m,s,o,function(err,ret){
@@ -232,6 +242,7 @@ function drawPrimeFactorPolygons(value, options) {
 };
 
 var two;
+var oscilloscope;
 $(document).ready(function(){
     buildScales();
 

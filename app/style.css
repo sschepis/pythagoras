@@ -49,6 +49,13 @@ td {
     background-color : red !important;
 }
 
+canvas {
+    border:  1px solid gray;
+    border-radius: 5px;
+    background: black;
+    width : 480px;
+    height : 480px;
+} 
 .480wide {
     width : 480px;
     height : auto;
@@ -57,11 +64,6 @@ td {
 .960wide {
     width : 960px;
     height : auto;
-}
-
-#rendercanvas {
-    width:480px;
-    height:480px;
 }
 
 .floatleft {
@@ -82,4 +84,5 @@ body  {
 .container { 
     margin: 0 auto;
     display: inline-block;
+    margin:20px;
 } 
