@@ -55,7 +55,7 @@ Oscilloscope.prototype.draw = function (context) {
 	if (this.zeroCross==0)
 		this.zeroCross=1;
 
-	context.strokeStyle = "#1C75BC";
+	context.strokeStyle = "#3366FF";
 
 	this.totalWindow = data.length;
 	for (var i=this.zeroCross, j=0; j < this.width + this.zeroCross && i<data.length; i++, j++) {

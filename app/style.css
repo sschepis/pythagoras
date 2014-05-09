@@ -56,11 +56,12 @@ td {
 }
 
 canvas, #rendercanvas {
-    border:  1px solid gray;
+    border:  1px solid #3366FF;
     border-radius: 5px;
     background: black;
     width : 480px;
     height : 480px;
+    margin : 5px;
 } 
 
 .480wide {
@@ -79,6 +80,11 @@ canvas, #rendercanvas {
 
 .floatright {
     float:right;
+}
+
+.tablecontainer {
+    border:  1px solid #3366FF;
+    border-radius: 5px;
 }
 
 body  {
