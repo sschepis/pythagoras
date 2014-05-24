@@ -1,0 +1,96 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <title>famo.us App</title>
+        <meta name="viewport" content="width=device-width, maximum-scale=1, user-scalable=no" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+
+        <!-- shims for backwards compatibility -->
+        <script type="text/javascript" src="http://code.famo.us/lib/functionPrototypeBind.js"></script>
+        <script type="text/javascript" src="http://code.famo.us/lib/classList.js"></script>
+        <script type="text/javascript" src="http://code.famo.us/lib/requestAnimationFrame.js"></script>
+
+        <!-- module loader -->
+        <script type="text/javascript" src="http://code.famo.us/lib/require.js"></script>
+
+        <!-- famous -->
+        <link rel="stylesheet" type="text/css" href="http://code.famo.us/famous/0.2.0/famous.css" />
+        <script type="text/javascript" src="http://code.famo.us/famous/0.2.0/famous.min.js"></script>
+
+        <!-- app code -->
+        <link rel="stylesheet" type="text/css" href="css/app.css" />
+        <script type="text/javascript">
+            var ultraVisualData = {
+                "Featured": [
+                    {
+                        "title": "<strong>Mandela</strong>Day",
+                        "paragraph": "Mandela:think of the children",
+                        "img": "assets/img1.jpg"
+                    },
+                    {
+                        "title": "<strong>Legacy</strong>Hope",
+                        "paragraph": "Not Like thatwhat is wrong withyou",
+                        "img": "assets/img2.jpg"
+                    },
+                    {
+                        "title": "<strong>Childrens</strong>/<strong>Hospitals</strong>",
+                        "paragraph": "Mandela:Ithoughtworseinjail",
+                        "img": "assets/img3.jpg"
+                    },
+                    {
+                        "title": "<strong>Uniting</strong>Strong",
+                        "paragraph": "Dont everlet me write marketingcopy fuckers",
+                        "img": "assets/img4.jpg"
+                    },
+                    {
+                        "title": "<strong>Video</strong>",
+                        "paragraph": "Tagit#Videoandmakeitappearhere",
+                        "img": "assets/img5.jpg"
+                    },
+                    {
+                        "title": "<strong>Animation</strong>",
+                        "paragraph": "Tagit#Animationandmakeitappearhere",
+                        "img": "assets/img6.jpg"
+                    },
+                    {
+                        "title": "<strong>Motion</strong>Blur",
+                        "paragraph": "Tagit#MotionBlurandmakeitappearhere",
+                        "img": "assets/img7.jpg"
+                    },
+                    {
+                        "title": "<strong>Sunrise</strong>",
+                        "paragraph": "Tagit#Sunriseandmakeitappearhere",
+                        "img": "assets/img8.jpg"
+                    },
+                    {
+                        "title": "<strong>STREET</strong>art",
+                        "paragraph": "Tagit#STREETartandmakeitappearhere",
+                        "img": "assets/img9.jpg"
+                    }
+                ]
+            };
+            require.config({
+                baseUrl: './src/'
+            });
+            require(['main']);
+        </script>
+    </head>
+    <body>
+        <div id="list-wrapper">
+
+        </div>
+
+        <div id="menu-wrapper">
+            <div id="menu-bg"></div>
+            <div id="menu-button">
+                <div class="menu-line"></div>
+                <div class="menu-line"></div>
+                <div class="menu-line"></div>
+                <div class="menu-line"></div>
+            </div>
+            <div class="text">Following</div>
+        </div>
+    </body>
+</html>
